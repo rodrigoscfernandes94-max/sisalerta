@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISALERTA-AAAe | Sistema de Mensagens de Alerta</title>
+    <style>
+        *, ::after, ::before { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+        html { line-height: 1.5; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { margin: 0; background-color: #f3f4f6; color: #1f2937; min-height: 100vh; display: flex; flex-direction: column; }
+        .military-bg { background-color: #1b3022; }
+        .military-btn { background-color: #2d4a34; color: #ffffff; width: 100%; padding: 0.75rem 1rem; border-radius: 0.375rem; font-weight: bold; font-size: 0.875rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s; }
+        .military-btn:hover { background-color: #3d6346; }
+        .active-tab { background-color: #2d4a34; color: #ffffff; font-weight: bold; }
+        .inactive-tab { background-color: transparent; color: #a7f3d0; }
+        .inactive-tab:hover { color: #ffffff; }
+        .sub-tab-active { background-color: #065f46; color: #ffffff; font-weight: bold; }
+        .sub-tab-inactive { background-color: #e5e7eb; color: #374151; }
+        .max-w-7xl { max-width: 85rem; margin-left: auto; margin-right: auto; }
+        .w-full { width: 100%; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-grow { flex-grow: 1; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .grid { display: grid; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .my-6 { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .bg-white { background-color: #ffffff; }
+        .border { border-width: 1px; }
+        .border-gray-200 { border-color: #e5e7eb; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .font-bold { font-weight: 700; }
+        .text-white { color: #ffffff; }
+        .text-green-300 { color: #86efac; }
+        input, select, textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.75rem; outline: none; background-color: #ffffff; }
+        
+        .msg-card { background: #ffffff; border: 1px solid #cbd5e1; border-top: 4px solid #2d4a34; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .msg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem 1rem; margin-top: 0.5rem; font-size: 0.75rem; background: #f8fafc; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #e2e8f0; }
+        .msg-item { display: flex; flex-direction: column; }
+        .msg-label { font-size: 0.65rem; font-weight: bold; color: #64748b; text-transform: uppercase; }
+        .msg-val { font-size: 0.8rem; font-weight: bold; color: #0f172a; }
+
+        .badge-ciente { background: #dcfce7; color: #166534; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; }
+
+        .banner-alerta-amarelo { background: #fef3c7; border: 2px solid #f59e0b; color: #78350f; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; animation: pulse 2s infinite; }
+        .banner-alerta-vermelho { background: #fee2e2; border: 2px solid #dc2626; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        @media print {
+            header, button, form, .no-print { display: none !important; }
+            body { background: white; color: black; }
+            .msg-card { border: 2px solid black !important; page-break-inside: avoid; }
+        }
+
+        @media (min-width: 768px) {
+            .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="military-bg text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col gap-3">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="width: 100px; display: flex; justify-content: start;">
+                    <img src="cmdo daae.png" alt="Cmdo DAAe Ex" style="height: 4.5rem; width: auto; object-fit: contain;">
+                </div>
+                
+                <div style="text-align: center; flex-grow: 1;">
+                    <h1 class="font-bold text-xl md:text-2xl leading-none tracking-wide" style="margin: 0; font-size: 1.5rem;">SISALERTA-AAAe</h1>
+                    <p class="text-xs text-green-300" style="margin-top: 0.25rem;">Sistema de Difusão de Alertas em Tempo Real</p>
+                </div>
+
+                <div style="width: 100px; display: flex; justify-content: end;">
+                    <img src="eb.webp" alt="Exército Brasileiro" style="height: 4.5rem; width: auto; object-fit: contain;">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <div class="flex items-center bg-emerald-950/80 p-1 rounded-lg border border-green-800 text-xs flex-wrap" style="display: flex; background: #022c22; padding: 0.25rem; border-radius: 0.5rem; border: 1px solid #065f46; gap: 0.25rem; justify-content: center;">
+                    <button id="btnMenuCmdo" onclick="tentarAcessarCmdo()" class="px-3 py-2 rounded-md transition active-tab" style="border: none; cursor: pointer;">
+                        🔒 Cmdo DAAe Ex
+                    </button>
+                    <button id="btnMenuGaaae" onclick="mudarPainelPrincipal('gaaae')" class="px-3 py-2 rounded-md transition inactive-tab" style="border: none; cursor: pointer;">
+                        🔒 GAAAe (Grupos) ▼
+                    </button>
+                    <button id="btnMenuBia" onclick="abrirModalSeletorBia()" class="px-3 py-2 rounded-md transition inactive-tab" style="border: none; cursor: pointer;">
+                        🔒 Bia AAAe (Baterias) ▼
+                    </button>
+                    <button id="btnMenuSecao" onclick="abrirModalSeletorSecao()" class="px-3 py-2 rounded-md transition inactive-tab" style="border: none; cursor: pointer;">
+                        🔒 Seção AAAe (Seções) ▼
+                    </button>
+                    <button id="btnMenuUtir" onclick="abrirModalSeletorUtir()" class="px-3 py-2 rounded-md transition inactive-tab" style="border: none; cursor: pointer;">
+                        📡 UTir AAAe (UTir) ▼
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto my-6 p-4 w-full flex-grow">
+
+        <!-- ================= PAINEL 1: CMDO DAAe Ex ================= -->
+        <div id="painelCmdo" style="display: block;">
+            
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <h3 class="font-bold text-sm text-green-950 mb-2 border-b pb-1">📊 Monitor de Cientes em Tempo Real (Cmdo DAAe Ex)</h3>
+                <div id="dashboardCmdoCientes" style="display: flex; gap: 0.5rem; flex-wrap: wrap; font-size: 0.75rem;">
+                    <span class="p-2 border rounded bg-gray-50">1º GAAAe: <b id="st_1º GAAAe" style="color:#dc2626;">Aguardando</b></span>
+                    <span class="p-2 border rounded bg-gray-50">2º GAAAe: <b id="st_2º GAAAe" style="color:#dc2626;">Aguardando</b></span>
+                    <span class="p-2 border rounded bg-gray-50">3º GAAAe: <b id="st_3º GAAAe" style="color:#dc2626;">Aguardando</b></span>
+                    <span class="p-2 border rounded bg-gray-50">4º GAAAe: <b id="st_4º GAAAe" style="color:#dc2626;">Aguardando</b></span>
+                    <span class="p-2 border rounded bg-gray-50">5º GAAAe Sl: <b id="st_5º GAAAe Sl" style="color:#dc2626;">Aguardando</b></span>
+                    <span class="p-2 border rounded bg-gray-50">11º GAAAe: <b id="st_11º GAAAe" style="color:#dc2626;">Aguardando</b></span>
+                    <span class="p-2 border rounded bg-gray-50">12º GAAAe: <b id="st_12º GAAAe" style="color:#dc2626;">Aguardando</b></span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="font-bold text-base mb-4 text-green-900 border-b pb-2">Emitir Mensagem Alerta (Cmdo DAAe Ex ➔ GAAAe)</h2>
+                <form id="formAlertaCmdo" onsubmit="salvarAlertaCmdo(event)">
+                    <input type="hidden" id="editIdCmdo">
+                    <div class="grid md:grid-cols-4 gap-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div><label class="text-xs font-bold uppercase">Indicativo</label><input type="text" id="mC_indicativo" required placeholder="Ex: ALERTA 01"></div>
+                        
+                        <div style="grid-column: span 3; background: #f8fafc; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem;">
+                            <label class="text-xs font-bold uppercase block mb-1 text-green-900">GAAAe Destino:</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.75rem;">
+                                <label style="font-weight: bold; color: #b45309;"><input type="checkbox" id="chk_todos_g" onchange="toggleTodosGAA(this)"> TODOS OS GAAAe</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="1º GAAAe"> 1º GAAAe</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="2º GAAAe"> 2º GAAAe</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="3º GAAAe"> 3º GAAAe</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="4º GAAAe"> 4º GAAAe</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="5º GAAAe Sl"> 5º GAAAe Sl</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="11º GAAAe"> 11º GAAAe</label>
+                                <label><input type="checkbox" class="chk-gaa-item" value="12º GAAAe"> 12º GAAAe</label>
+                            </div>
+                        </div>
+
+                        <div><label class="text-xs font-bold uppercase">Azimute (0º a 360º)</label><input type="number" id="mC_azimute" min="0" max="360" required placeholder="Ex: 180"></div>
+                        <div><label class="text-xs font-bold uppercase">Distância (NM)</label><input type="number" step="0.1" id="mC_distancia" required placeholder="Ex: 45.5"></div>
+                        <div><label class="text-xs font-bold uppercase">IDT</label><input type="text" id="mC_idt" required placeholder="Ex: Hostil"></div>
+                        <div><label class="text-xs font-bold uppercase">Nr e Tipo</label><input type="text" id="mC_nrtipo" required placeholder="Ex: 02 Caças"></div>
+                        <div><label class="text-xs font-bold uppercase">Velocidade (Kt)</label><input type="number" id="mC_vel" required placeholder="Ex: 420"></div>
+                        <div><label class="text-xs font-bold uppercase">Rumo (Graus)</label><input type="number" id="mC_rumo" required placeholder="Ex: 090"></div>
+                        <div><label class="text-xs font-bold uppercase">Tempo (Min)</label><input type="number" id="mC_tempo" required placeholder="Ex: 12"></div>
+                        <div><label class="text-xs font-bold uppercase">IFF</label><input type="text" id="mC_iff" required placeholder="Ex: Modo 3/A"></div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label class="text-xs font-bold uppercase">Data/Hora (Zulu)</label>
+                                <button type="button" onclick="preencherHoraZulu('mC_datahora')" style="font-size:10px; background:#eab308; border:none; padding:1px 4px; border-radius:2px; font-weight:bold; cursor:pointer;">🕒 Hora Z</button>
+                            </div>
+                            <input type="text" id="mC_datahora" required placeholder="Ex: 221425Z OCT 26">
+                        </div>
+                        <div><label class="text-xs font-bold uppercase">Emissor</label><input type="text" id="mC_emissor" required value="Cmdo DAAe Ex"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="military-btn">TRANSMITIR ALERTA AOS GAAAe</button>
+                        <button type="button" id="btnCancelaCmdo" onclick="cancelarEdicaoCmdo()" style="display:none; background:#6b7280; color:white; border:none; padding:0.5rem 1rem; border-radius:0.375rem; font-weight:bold; cursor:pointer;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mt-6">
+                <h3 class="font-bold text-base mb-3 text-gray-800">Mensagens Emitidas pelo Comando</h3>
+                <div id="cardsCmdo"></div>
+            </div>
+        </div>
+
+        <!-- ================= PAINEL 2: GAAAe ================= -->
+        <div id="painelGaaae" style="display: none;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; background: #e2e8f0; padding: 0.5rem; border-radius: 0.5rem;">
+                <button onclick="tentarTrocarGaaae('1º GAAAe')" id="sub_1º GAAAe" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">1º GAAAe</button>
+                <button onclick="tentarTrocarGaaae('2º GAAAe')" id="sub_2º GAAAe" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">2º GAAAe</button>
+                <button onclick="tentarTrocarGaaae('3º GAAAe')" id="sub_3º GAAAe" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">3º GAAAe</button>
+                <button onclick="tentarTrocarGaaae('4º GAAAe')" id="sub_4º GAAAe" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">4º GAAAe</button>
+                <button onclick="tentarTrocarGaaae('5º GAAAe Sl')" id="sub_5º GAAAe Sl" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">5º GAAAe Sl</button>
+                <button onclick="tentarTrocarGaaae('11º GAAAe')" id="sub_11º GAAAe" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">11º GAAAe</button>
+                <button onclick="tentarTrocarGaaae('12º GAAAe')" id="sub_12º GAAAe" class="px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive" style="cursor:pointer; border:none;">12º GAAAe</button>
+            </div>
+
+            <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                <h4 id="tituloRecGaaae" class="font-bold text-sm text-amber-900 mb-2">📥 Alertas Recebidos do Cmdo DAAe Ex</h4>
+                <div id="listaRecebidaGaaae">Selecione um GAAAe na barra superior.</div>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <h2 id="tituloFormGaaae" class="font-bold text-base mb-4 text-green-900 border-b pb-2">Desdobrar Alerta para Baterias ou Seções</h2>
+                <form id="formAlertaGaaae" onsubmit="salvarAlertaGaaae(event)">
+                    <input type="hidden" id="editIdGaaae">
+                    <div class="grid md:grid-cols-4 gap-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div><label class="text-xs font-bold uppercase">Indicativo</label><input type="text" id="mG_indicativo" required></div>
+                        
+                        <div style="grid-column: span 3; background: #f8fafc; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem;">
+                            <label class="text-xs font-bold uppercase block mb-1 text-green-900">Destino (Baterias ou Seções Específicas):</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.75rem; max-height: 150px; overflow-y: auto;">
+                                <label style="font-weight: bold; color: #b45309; width: 100%;"><input type="checkbox" id="chk_todas_bia_ou_sec" onchange="toggleTodasBiaGaaae(this)"> TODAS AS BATERIAS E SEÇÕES</label>
+                                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; width: 100%;">
+                                    <div>
+                                        <b style="color:#1b3022;">1ª Bia AAAe:</b><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="1ª Bia AAAe"> [Bateria Inteira]</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="1ª Seção / 1ª Bia AAAe"> 1ª Seção</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="2ª Seção / 1ª Bia AAAe"> 2ª Seção</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="3ª Seção / 1ª Bia AAAe"> 3ª Seção</label>
+                                    </div>
+                                    <div>
+                                        <b style="color:#1b3022;">2ª Bia AAAe:</b><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="2ª Bia AAAe"> [Bateria Inteira]</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="1ª Seção / 2ª Bia AAAe"> 1ª Seção</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="2ª Seção / 2ª Bia AAAe"> 2ª Seção</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="3ª Seção / 2ª Bia AAAe"> 3ª Seção</label>
+                                    </div>
+                                    <div>
+                                        <b style="color:#1b3022;">3ª Bia AAAe:</b><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="3ª Bia AAAe"> [Bateria Inteira]</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="1ª Seção / 3ª Bia AAAe"> 1ª Seção</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="2ª Seção / 3ª Bia AAAe"> 2ª Seção</label><br>
+                                        <label><input type="checkbox" class="chk-g-dest" value="3ª Seção / 3ª Bia AAAe"> 3ª Seção</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div><label class="text-xs font-bold uppercase">Azimute (0º a 360º)</label><input type="number" id="mG_azimute" min="0" max="360" required></div>
+                        <div><label class="text-xs font-bold uppercase">Distância (NM)</label><input type="number" step="0.1" id="mG_distancia" required></div>
+                        <div><label class="text-xs font-bold uppercase">IDT</label><input type="text" id="mG_idt" required></div>
+                        <div><label class="text-xs font-bold uppercase">Nr e Tipo</label><input type="text" id="mG_nrtipo" required></div>
+                        <div><label class="text-xs font-bold uppercase">Velocidade (Kt)</label><input type="number" id="mG_vel" required></div>
+                        <div><label class="text-xs font-bold uppercase">Rumo (Graus)</label><input type="number" id="mG_rumo" required></div>
+                        <div><label class="text-xs font-bold uppercase">Tempo (Min)</label><input type="number" id="mG_tempo" required></div>
+                        <div><label class="text-xs font-bold uppercase">IFF</label><input type="text" id="mG_iff" required></div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label class="text-xs font-bold uppercase">Data/Hora (Zulu)</label>
+                                <button type="button" onclick="preencherHoraZulu('mG_datahora')" style="font-size:10px; background:#eab308; border:none; padding:1px 4px; border-radius:2px; font-weight:bold; cursor:pointer;">🕒 Hora Z</button>
+                            </div>
+                            <input type="text" id="mG_datahora" required>
+                        </div>
+                        <div><label class="text-xs font-bold uppercase">Emissor</label><input type="text" id="mG_emissor" required></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="military-btn">TRANSMITIR ALERTA ÀS UNIDADES</button>
+                        <button type="button" id="btnCancelaGaaae" onclick="cancelarEdicaoGaaae()" style="display:none; background:#6b7280; color:white; border:none; padding:0.5rem 1rem; border-radius:0.375rem; font-weight:bold; cursor:pointer;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                <h3 id="tituloHistoricoGaaae" class="font-bold text-base mb-3 text-gray-800">Alertas Emitidos pelo Grupo</h3>
+                <div id="cardsHistoricoGaaae"><p style="color:#9ca3af; text-align:center;">Selecione um GAAAe acima.</p></div>
+            </div>
+        </div>
+
+        <!-- ================= PAINEL 3: Bia AAAe ================= -->
+        <div id="painelBia" style="display: none;">
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2d4a34; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    <div>
+                        <h2 id="tituloPainelBia" class="font-bold text-lg text-green-950">Painel de Alertas - Bia AAAe</h2>
+                        <p class="text-xs text-gray-600">Gestão e desdobramento para as Seções Antiaéreas.</p>
+                    </div>
+                    <button onclick="abrirModalSeletorBia()" style="background:#b45309; color:white; border:none; padding:0.3rem 0.75rem; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; cursor:pointer;">Trocar de Bateria</button>
+                </div>
+
+                <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                    <h4 class="font-bold text-sm text-blue-900 mb-2">📥 Alertas Recebidos do GAAAe</h4>
+                    <div id="listaRecebidaBia">Selecione uma Bateria.</div>
+                </div>
+
+                <h3 class="font-bold text-base mb-4 text-green-900 border-b pb-2">Desdobrar Alerta para as Seções (Seção AAAe)</h3>
+                <form id="formAlertaBia" onsubmit="salvarAlertaBia(event)">
+                    <input type="hidden" id="editIdBia">
+                    <div class="grid md:grid-cols-4 gap-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div><label class="text-xs font-bold uppercase">Indicativo</label><input type="text" id="mB_indicativo" required></div>
+                        
+                        <div style="grid-column: span 3; background: #f8fafc; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem;">
+                            <label class="text-xs font-bold uppercase block mb-1 text-green-900">Seção AAAe Destino:</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.75rem;">
+                                <label style="font-weight: bold; color: #b45309;"><input type="checkbox" id="chk_todas_sec" onchange="toggleTodasSec(this)"> TODAS AS SEÇÕES (1ª, 2ª e 3ª)</label>
+                                <label><input type="checkbox" class="chk-sec-item" value="1ª Seção"> 1ª Seção</label>
+                                <label><input type="checkbox" class="chk-sec-item" value="2ª Seção"> 2ª Seção</label>
+                                <label><input type="checkbox" class="chk-sec-item" value="3ª Seção"> 3ª Seção</label>
+                            </div>
+                        </div>
+
+                        <div><label class="text-xs font-bold uppercase">Azimute (0º a 360º)</label><input type="number" id="mB_azimute" min="0" max="360" required></div>
+                        <div><label class="text-xs font-bold uppercase">Distância (NM)</label><input type="number" step="0.1" id="mB_distancia" required></div>
+                        <div><label class="text-xs font-bold uppercase">IDT</label><input type="text" id="mB_idt" required></div>
+                        <div><label class="text-xs font-bold uppercase">Nr e Tipo</label><input type="text" id="mB_nrtipo" required></div>
+                        <div><label class="text-xs font-bold uppercase">Velocidade (Kt)</label><input type="number" id="mB_vel" required></div>
+                        <div><label class="text-xs font-bold uppercase">Rumo (Graus)</label><input type="number" id="mB_rumo" required></div>
+                        <div><label class="text-xs font-bold uppercase">Tempo (Min)</label><input type="number" id="mB_tempo" required></div>
+                        <div><label class="text-xs font-bold uppercase">IFF</label><input type="text" id="mB_iff" required></div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label class="text-xs font-bold uppercase">Data/Hora (Zulu)</label>
+                                <button type="button" onclick="preencherHoraZulu('mB_datahora')" style="font-size:10px; background:#eab308; border:none; padding:1px 4px; border-radius:2px; font-weight:bold; cursor:pointer;">🕒 Hora Z</button>
+                            </div>
+                            <input type="text" id="mB_datahora" required>
+                        </div>
+                        <div><label class="text-xs font-bold uppercase">Emissor</label><input type="text" id="mB_emissor" required></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="military-btn">TRANSMITIR ALERTA ÀS SEÇÕES</button>
+                        <button type="button" id="btnCancelaBia" onclick="cancelarEdicaoBia()" style="display:none; background:#6b7280; color:white; border:none; padding:0.5rem 1rem; border-radius:0.375rem; font-weight:bold; cursor:pointer;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                <h3 class="font-bold text-base mb-3 text-gray-800">Alertas Emitidos pela Bateria para as Seções</h3>
+                <div id="cardsHistoricoBia"></div>
+            </div>
+        </div>
+
+        <!-- ================= PAINEL 4: Seção AAAe ================= -->
+        <div id="painelSecao" style="display: none;">
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-6">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2d4a34; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    <div>
+                        <h2 id="tituloPainelSecao" class="font-bold text-lg text-green-950">Painel da Seção AAAe</h2>
+                        <p class="text-xs text-gray-600">Gestão e desdobramento direto para as Unidades de Tiro (UTir).</p>
+                    </div>
+                    <button onclick="abrirModalSeletorSecao()" style="background:#b45309; color:white; border:none; padding:0.3rem 0.75rem; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; cursor:pointer;">Trocar de Seção</button>
+                </div>
+
+                <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                    <h4 class="font-bold text-sm text-green-900 mb-2">📥 Alertas Recebidos (Bateria / GAAAe)</h4>
+                    <div id="listaRecebidaSecao">Selecione uma Seção.</div>
+                </div>
+
+                <h3 class="font-bold text-base mb-4 text-green-900 border-b pb-2">Desdobrar Alerta para as Unidades de Tiro (9 UTir)</h3>
+                <form id="formAlertaSecao" onsubmit="salvarAlertaSecao(event)">
+                    <input type="hidden" id="editIdSecao">
+                    <div class="grid md:grid-cols-4 gap-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div><label class="text-xs font-bold uppercase">Indicativo</label><input type="text" id="mS_indicativo" required></div>
+                        
+                        <div style="grid-column: span 3; background: #f8fafc; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem;">
+                            <label class="text-xs font-bold uppercase block mb-1 text-green-900">UTir Destino (1 a 9):</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.75rem;">
+                                <label style="font-weight: bold; color: #b45309;"><input type="checkbox" id="chk_todas_utir" onchange="toggleTodasUtir(this)"> TODAS AS UTIR (1 a 9)</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="1ª UTir"> UTir 1</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="2ª UTir"> UTir 2</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="3ª UTir"> UTir 3</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="4ª UTir"> UTir 4</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="5ª UTir"> UTir 5</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="6ª UTir"> UTir 6</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="7ª UTir"> UTir 7</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="8ª UTir"> UTir 8</label>
+                                <label><input type="checkbox" class="chk-utir-item" value="9ª UTir"> UTir 9</label>
+                            </div>
+                        </div>
+
+                        <div><label class="text-xs font-bold uppercase">Azimute (0º a 360º)</label><input type="number" id="mS_azimute" min="0" max="360" required></div>
+                        <div><label class="text-xs font-bold uppercase">Distância (NM)</label><input type="number" step="0.1" id="mS_distancia" required></div>
+                        <div><label class="text-xs font-bold uppercase">IDT</label><input type="text" id="mS_idt" required></div>
+                        <div><label class="text-xs font-bold uppercase">Nr e Tipo</label><input type="text" id="mS_nrtipo" required></div>
+                        <div><label class="text-xs font-bold uppercase">Velocidade (Kt)</label><input type="number" id="mS_vel" required></div>
+                        <div><label class="text-xs font-bold uppercase">Rumo (Graus)</label><input type="number" id="mS_rumo" required></div>
+                        <div><label class="text-xs font-bold uppercase">Tempo (Min)</label><input type="number" id="mS_tempo" required></div>
+                        <div><label class="text-xs font-bold uppercase">IFF</label><input type="text" id="mS_iff" required></div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label class="text-xs font-bold uppercase">Data/Hora (Zulu)</label>
+                                <button type="button" onclick="preencherHoraZulu('mS_datahora')" style="font-size:10px; background:#eab308; border:none; padding:1px 4px; border-radius:2px; font-weight:bold; cursor:pointer;">🕒 Hora Z</button>
+                            </div>
+                            <input type="text" id="mS_datahora" required>
+                        </div>
+                        <div><label class="text-xs font-bold uppercase">Emissor</label><input type="text" id="mS_emissor" required></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="military-btn">DISPARAR ALERTA ÀS UTIR</button>
+                        <button type="button" id="btnCancelaSecao" onclick="cancelarEdicaoSecao()" style="display:none; background:#6b7280; color:white; border:none; padding:0.5rem 1rem; border-radius:0.375rem; font-weight:bold; cursor:pointer;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                <h3 class="font-bold text-base mb-3 text-gray-800">Alertas Emitidos pela Seção para as UTir</h3>
+                <div id="cardsHistoricoSecao"></div>
+            </div>
+        </div>
+
+        <!-- ================= PAINEL 5: UTir ================= -->
+        <div id="painelUtir" style="display: none;">
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2d4a34; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                    <div>
+                        <h2 id="tituloPainelUtir" class="font-bold text-lg text-green-950">📡 Módulo UTir AAAe (UTir)</h2>
+                        <p class="text-xs text-gray-600">Recepção e Gradiente Tático de Alertas em Tempo Real (Somente Leitura).</p>
+                    </div>
+                    <button onclick="abrirModalSeletorUtir()" style="background:#b45309; color:white; border:none; padding:0.3rem 0.75rem; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; cursor:pointer;">Trocar de UTir</button>
+                </div>
+
+                <div id="statusTaticoUtir"></div>
+                <div id="cardsUtirVisualizacao"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAIS DE ACESSO -->
+    <div id="modalSenha" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; width: 100%; max-width: 400px; border-top: 4px solid #f59e0b; margin: auto;">
+            <h3 id="modalTituloSenha" style="font-weight: bold; font-size: 1rem; margin: 0 0 0.5rem 0;">Acesso Restrito</h3>
+            <form onsubmit="validarSenhaModal(event)">
+                <input type="password" id="inputSenhaModal" required placeholder="Digite a senha..." style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" onclick="fecharModalSenha()" style="padding: 0.5rem 1rem; background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold; border: none; cursor: pointer;">Cancelar</button>
+                    <button type="submit" style="padding: 0.5rem 1rem; background: #2d4a34; color: white; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold; border: none; cursor: pointer;">CONFIRMAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalSeletorBia" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; width: 100%; max-width: 450px; border-top: 4px solid #1b3022; margin: auto;">
+            <h3 style="font-weight: bold; font-size: 1rem; margin: 0 0 1rem 0; color: #1b3022;">Autenticar Bateria (Bia AAAe)</h3>
+            <form onsubmit="validarLoginBia(event)">
+                <div style="margin-bottom: 0.75rem;"><label class="text-xs font-bold uppercase">GAAAe:</label><select id="selBiaGaaae" required><option value="">Escolha...</option><option value="1º GAAAe">1º GAAAe</option><option value="2º GAAAe">2º GAAAe</option><option value="3º GAAAe">3º GAAAe</option><option value="4º GAAAe">4º GAAAe</option><option value="5º GAAAe Sl">5º GAAAe Sl</option><option value="11º GAAAe">11º GAAAe</option><option value="12º GAAAe">12º GAAAe</option></select></div>
+                <div style="margin-bottom: 0.75rem;"><label class="text-xs font-bold uppercase">Bateria:</label><select id="selBiaBateria" required><option value="">Escolha...</option><option value="1ª Bia AAAe">1ª Bia AAAe</option><option value="2ª Bia AAAe">2ª Bia AAAe</option><option value="3ª Bia AAAe">3ª Bia AAAe</option></select></div>
+                <div style="margin-bottom: 1rem;"><label class="text-xs font-bold uppercase">Senha:</label><input type="password" id="inputSenhaBia" required placeholder="Digite a senha..."></div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;"><button type="button" onclick="fecharModalSeletorBia()" style="padding:0.5rem 1rem; background:#e5e7eb; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; border:none; cursor:pointer;">Cancelar</button><button type="submit" style="padding:0.5rem 1rem; background:#1b3022; color:white; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; border:none; cursor:pointer;">ENTRAR</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalSeletorSecao" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; width: 100%; max-width: 450px; border-top: 4px solid #065f46; margin: auto;">
+            <h3 style="font-weight: bold; font-size: 1rem; margin: 0 0 1rem 0; color: #065f46;">Autenticar Seção (Seção AAAe)</h3>
+            <form onsubmit="validarLoginSecao(event)">
+                <div style="margin-bottom: 0.75rem;"><label class="text-xs font-bold uppercase">GAAAe:</label><select id="selSecGaaae" required><option value="">Escolha...</option><option value="1º GAAAe">1º GAAAe</option><option value="2º GAAAe">2º GAAAe</option><option value="3º GAAAe">3º GAAAe</option><option value="4º GAAAe">4º GAAAe</option><option value="5º GAAAe Sl">5º GAAAe Sl</option><option value="11º GAAAe">11º GAAAe</option><option value="12º GAAAe">12º GAAAe</option></select></div>
+                <div style="margin-bottom: 0.75rem;"><label class="text-xs font-bold uppercase">Bateria:</label><select id="selSecBateria" required><option value="">Escolha...</option><option value="1ª Bia AAAe">1ª Bia AAAe</option><option value="2ª Bia AAAe">2ª Bia AAAe</option><option value="3ª Bia AAAe">3ª Bia AAAe</option></select></div>
+                <div style="margin-bottom: 0.75rem;"><label class="text-xs font-bold uppercase">Seção:</label><select id="selSecSecao" required><option value="">Escolha...</option><option value="1ª Seção">1ª Seção</option><option value="2ª Seção">2ª Seção</option><option value="3ª Seção">3ª Seção</option></select></div>
+                <div style="margin-bottom: 1rem;"><label class="text-xs font-bold uppercase">Senha:</label><input type="password" id="inputSenhaSecao" required placeholder="Ex: 1s1b1g"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;"><button type="button" onclick="fecharModalSeletorSecao()" style="padding:0.5rem 1rem; background:#e5e7eb; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; border:none; cursor:pointer;">Cancelar</button><button type="submit" style="padding:0.5rem 1rem; background:#065f46; color:white; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; border:none; cursor:pointer;">ENTRAR</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalSeletorUtir" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; width: 100%; max-width: 450px; border-top: 4px solid #dc2626; margin: auto;">
+            <h3 style="font-weight: bold; font-size: 1rem; margin: 0 0 1rem 0; color: #dc2626;">Autenticar Unidade de Tiro (9 UTir)</h3>
+            <form onsubmit="validarLoginUtir(event)">
+                <div style="margin-bottom: 0.5rem;"><label class="text-xs font-bold uppercase">GAAAe:</label><select id="selUtirGaaae" required><option value="">Escolha...</option><option value="1º GAAAe">1º GAAAe</option><option value="2º GAAAe">2º GAAAe</option><option value="3º GAAAe">3º GAAAe</option><option value="4º GAAAe">4º GAAAe</option><option value="5º GAAAe Sl">5º GAAAe Sl</option><option value="11º GAAAe">11º GAAAe</option><option value="12º GAAAe">12º GAAAe</option></select></div>
+                <div style="margin-bottom: 0.5rem;"><label class="text-xs font-bold uppercase">Bateria:</label><select id="selUtirBateria" required><option value="">Escolha...</option><option value="1ª Bia AAAe">1ª Bia AAAe</option><option value="2ª Bia AAAe">2ª Bia AAAe</option><option value="3ª Bia AAAe">3ª Bia AAAe</option></select></div>
+                <div style="margin-bottom: 0.5rem;"><label class="text-xs font-bold uppercase">Seção:</label><select id="selUtirSecao" required><option value="">Escolha...</option><option value="1ª Seção">1ª Seção</option><option value="2ª Seção">2ª Seção</option><option value="3ª Seção">3ª Seção</option></select></div>
+                <div style="margin-bottom: 0.5rem;"><label class="text-xs font-bold uppercase">UTir (1 a 9):</label><select id="selUtirUtir" required><option value="">Escolha...</option><option value="1ª UTir">1ª UTir</option><option value="2ª UTir">2ª UTir</option><option value="3ª UTir">3ª UTir</option><option value="4ª UTir">4ª UTir</option><option value="5ª UTir">5ª UTir</option><option value="6ª UTir">6ª UTir</option><option value="7ª UTir">7ª UTir</option><option value="8ª UTir">8ª UTir</option><option value="9ª UTir">9ª UTir</option></select></div>
+                <div style="margin-bottom: 1rem;"><label class="text-xs font-bold uppercase">Senha:</label><input type="password" id="inputSenhaUtir" required placeholder="Ex: 1u1s1b1g"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;"><button type="button" onclick="fecharModalSeletorUtir()" style="padding:0.5rem 1rem; background:#e5e7eb; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; border:none; cursor:pointer;">Cancelar</button><button type="submit" style="padding:0.5rem 1rem; background:#dc2626; color:white; border-radius:0.25rem; font-size:0.75rem; font-weight:bold; border:none; cursor:pointer;">ENTRAR</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SDK Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYzlVN6Y9AvtJF5vT65JCKXy7ga48mVJg",
+            authDomain: "siscord-eb.firebaseapp.com",
+            databaseURL: "https://siscord-eb-default-rtdb.firebaseio.com",
+            projectId: "siscord-eb",
+            storageBucket: "siscord-eb.firebasestorage.app",
+            messagingSenderId: "523448874412",
+            appId: "1:523448874412:web:4277213ea4a2067ac97609"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function tocarAlertaSonoro() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch(e){}
+        }
+
+        function preencherHoraZulu(inputId) {
+            const agora = new Date();
+            const dia = String(agora.getUTCDate()).padStart(2, '0');
+            const horas = String(agora.getUTCHours()).padStart(2, '0');
+            const minutos = String(agora.getUTCMinutes()).padStart(2, '0');
+            const meses = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            const mes = meses[agora.getUTCMonth()];
+            const ano = String(agora.getUTCFullYear()).slice(-2);
+            document.getElementById(inputId).value = `${dia}${horas}${minutos}Z ${mes} ${ano}`;
+        }
+
+        const senhasGAAAe = { "1º GAAAe": "prometeu", "2º GAAAe": "atlas", "3º GAAAe": "polux", "4º GAAAe": "castro", "5º GAAAe Sl": "rico", "11º GAAAe": "ajax", "12º GAAAe": "taiti" };
+        const mapGaaaeNum = { "1º GAAAe": "1g", "2º GAAAe": "2g", "3º GAAAe": "3g", "4º GAAAe": "4g", "5º GAAAe Sl": "5g", "11º GAAAe": "11g", "12º GAAAe": "12g" };
+
+        const senhasBaterias = {};
+        Object.keys(mapGaaaeNum).forEach(g => {
+            const numG = mapGaaaeNum[g];
+            senhasBaterias[g] = { "1ª Bia AAAe": `1bia${numG}`, "2ª Bia AAAe": `2bia${numG}`, "3ª Bia AAAe": `3bia${numG}` };
+        });
+
+        const senhasSecoes = {};
+        Object.keys(mapGaaaeNum).forEach(g => {
+            const numG = mapGaaaeNum[g];
+            senhasSecoes[g] = {};
+            [1, 2, 3].forEach(b => {
+                senhasSecoes[g][`${b}ª Bia AAAe`] = { "1ª Seção": `1s${b}b${numG}`, "2ª Seção": `2s${b}b${numG}`, "3ª Seção": `3s${b}b${numG}` };
+            });
+        });
+
+        const senhasUtir = {};
+        Object.keys(mapGaaaeNum).forEach(g => {
+            const numG = mapGaaaeNum[g];
+            senhasUtir[g] = {};
+            [1, 2, 3].forEach(b => {
+                const biaNome = `${b}ª Bia AAAe`;
+                senhasUtir[g][biaNome] = {};
+                [1, 2, 3].forEach(s => {
+                    const secNome = `${s}ª Seção`;
+                    senhasUtir[g][biaNome][secNome] = {};
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(u => {
+                        senhasUtir[g][biaNome][secNome][`${u}ª UTir`] = `${u}u${s}s${b}b${numG}`;
+                    });
+                });
+            });
+        });
+
+        let tipoPendencia = ""; 
+        let unidadeAtivaGaaae = "";
+        let biaAtivaGaaae = "", biaAtivaNome = "";
+        let secAtivaGaaae = "", secAtivaBia = "", secAtivaNome = "";
+        let utirAtivaGaaae = "", utirAtivaBia = "", utirAtivaSec = "", utirAtivaNome = "";
+
+        let mensagensCmdo = {};
+        let mensagensGaaae = {};
+        let mensagensBia = {};
+        let mensagensSecao = {};
+
+        db.ref('sisalerta/mensagensCmdo').on('value', (s) => { 
+            mensagensCmdo = s.val() || {}; 
+            renderizarCardsCmdo(); 
+            atualizarDashboardCmdo();
+            if (unidadeAtivaGaaae) { atualizarRecebidasGaaae(); tocarAlertaSonoro(); }
+        });
+
+        db.ref('sisalerta/mensagensGaaae').on('value', (s) => { 
+            mensagensGaaae = s.val() || {}; 
+            if (unidadeAtivaGaaae) renderizarHistoricoGaaae(); 
+            if (biaAtivaGaaae) { atualizarRecebidasBia(); tocarAlertaSonoro(); }
+            if (secAtivaGaaae) { atualizarRecebidasSecao(); tocarAlertaSonoro(); }
+            if (utirAtivaGaaae) { renderizarPainelUtir(); tocarAlertaSonoro(); }
+        });
+
+        db.ref('sisalerta/mensagensBia').on('value', (s) => { 
+            mensagensBia = s.val() || {}; 
+            if (biaAtivaGaaae) renderizarHistoricoBia(); 
+            if (secAtivaGaaae) { atualizarRecebidasSecao(); tocarAlertaSonoro(); }
+            if (utirAtivaGaaae) { renderizarPainelUtir(); tocarAlertaSonoro(); }
+        });
+
+        db.ref('sisalerta/mensagensSecao').on('value', (s) => { 
+            mensagensSecao = s.val() || {}; 
+            if (secAtivaGaaae) renderizarHistoricoSecao(); 
+            if (utirAtivaGaaae) { renderizarPainelUtir(); tocarAlertaSonoro(); }
+        });
+
+        function registrarCiente(caminhoDb, idMsg, nomeUnidade) {
+            const agora = new Date();
+            const horaZ = `${String(agora.getUTCDate()).padStart(2,'0')}${String(agora.getUTCHours()).padStart(2,'0')}${String(agora.getUTCMinutes()).padStart(2,'0')}Z`;
+            db.ref(`${caminhoDb}/${idMsg}/cientes/${nomeUnidade}`).set(horaZ);
+            alert(`Ciente registrado com sucesso para ${nomeUnidade} (${horaZ})!`);
+        }
+
+        function tentarAcessarCmdo() { tipoPendencia = "cmdo"; abrirModalSenha("Senha do Cmdo DAAe Ex:"); }
+        function tentarTrocarGaaae(u) { tipoPendencia = u; abrirModalSenha(`Senha do ${u}:`); }
+        function abrirModalSenha(t) { document.getElementById('modalTituloSenha').innerText = t; document.getElementById('inputSenhaModal').value = ''; document.getElementById('modalSenha').style.display = 'flex'; }
+        function fecharModalSenha() { document.getElementById('modalSenha').style.display = 'none'; }
+
+        function validarSenhaModal(e) {
+            e.preventDefault();
+            const senha = document.getElementById('inputSenhaModal').value;
+            if (tipoPendencia === "cmdo" && senha === "artilharia") { fecharModalSenha(); mudarPainelPrincipal('cmdo'); }
+            else if (senhasGAAAe[tipoPendencia] && senha === senhasGAAAe[tipoPendencia]) {
+                fecharModalSenha(); unidadeAtivaGaaae = tipoPendencia;
+                mudarPainelPrincipal('gaaae'); destacarSubAbaAtiva(unidadeAtivaGaaae);
+                document.getElementById('mG_emissor').value = unidadeAtivaGaaae;
+                atualizarRecebidasGaaae(); renderizarHistoricoGaaae();
+            } else { alert("Senha incorreta!"); }
+        }
+
+        function mudarPainelPrincipal(painel) {
+            ['Cmdo', 'Gaaae', 'Bia', 'Secao', 'Utir'].forEach(p => {
+                const el = document.getElementById(`painel${p}`);
+                if(el) el.style.display = (painel.toLowerCase() === p.toLowerCase()) ? 'block' : 'none';
+                const btn = document.getElementById(`btnMenu${p}`);
+                if(btn) btn.className = (painel.toLowerCase() === p.toLowerCase()) ? "px-3 py-2 rounded-md transition active-tab" : "px-3 py-2 rounded-md transition inactive-tab";
+            });
+        }
+
+        function destacarSubAbaAtiva(u) {
+            ["1º GAAAe", "2º GAAAe", "3º GAAAe", "4º GAAAe", "5º GAAAe Sl", "11º GAAAe", "12º GAAAe"].forEach(x => {
+                const b = document.getElementById(`sub_${x}`); if(b) b.className = (x === u) ? "px-3 py-1.5 rounded text-xs font-bold sub-tab-active" : "px-3 py-1.5 rounded text-xs font-bold sub-tab-inactive";
+            });
+        }
+
+        function abrirModalSeletorBia() { document.getElementById('modalSeletorBia').style.display = 'flex'; }
+        function fecharModalSeletorBia() { document.getElementById('modalSeletorBia').style.display = 'none'; }
+        function validarLoginBia(e) {
+            e.preventDefault();
+            const g = document.getElementById('selBiaGaaae').value, b = document.getElementById('selBiaBateria').value, s = document.getElementById('inputSenhaBia').value;
+            if (senhasBaterias[g]?.[b] === s) {
+                biaAtivaGaaae = g; biaAtivaNome = b; fecharModalSeletorBia(); mudarPainelPrincipal('bia');
+                document.getElementById('mB_emissor').value = `${b} / ${g}`;
+                document.getElementById('tituloPainelBia').innerText = `Painel de Alertas - ${b} (${g})`;
+                atualizarRecebidasBia(); renderizarHistoricoBia();
+            } else alert("Senha da Bateria incorreta!");
+        }
+
+        function abrirModalSeletorSecao() { document.getElementById('modalSeletorSecao').style.display = 'flex'; }
+        function fecharModalSeletorSecao() { document.getElementById('modalSeletorSecao').style.display = 'none'; }
+        function validarLoginSecao(e) {
+            e.preventDefault();
+            const g = document.getElementById('selSecGaaae').value, b = document.getElementById('selSecBateria').value, sec = document.getElementById('selSecSecao').value, s = document.getElementById('inputSenhaSecao').value;
+            if (senhasSecoes[g]?.[b]?.[sec] === s) {
+                secAtivaGaaae = g; secAtivaBia = b; secAtivaNome = sec; fecharModalSeletorSecao(); mudarPainelPrincipal('secao');
+                document.getElementById('mS_emissor').value = `${sec} / ${b} / ${g}`;
+                document.getElementById('tituloPainelSecao').innerText = `Painel da ${sec} (${b} / ${g})`;
+                atualizarRecebidasSecao(); renderizarHistoricoSecao();
+            } else alert("Senha da Seção incorreta!");
+        }
+
+        function abrirModalSeletorUtir() { document.getElementById('modalSeletorUtir').style.display = 'flex'; }
+        function fecharModalSeletorUtir() { document.getElementById('modalSeletorUtir').style.display = 'none'; }
+        function validarLoginUtir(e) {
+            e.preventDefault();
+            const g = document.getElementById('selUtirGaaae').value, b = document.getElementById('selUtirBateria').value, sec = document.getElementById('selUtirSecao').value, u = document.getElementById('selUtirUtir').value, s = document.getElementById('inputSenhaUtir').value;
+            if (senhasUtir[g]?.[b]?.[sec]?.[u] === s) {
+                utirAtivaGaaae = g; utirAtivaBia = b; utirAtivaSec = sec; utirAtivaNome = u; fecharModalSeletorUtir(); mudarPainelPrincipal('utir');
+                renderizarPainelUtir();
+            } else alert("Senha da UTir incorreta!");
+        }
+
+        function toggleTodosGAA(m) { document.querySelectorAll('.chk-gaa-item').forEach(c => c.checked = m.checked); }
+        function toggleTodasBiaGaaae(m) { document.querySelectorAll('.chk-g-dest').forEach(c => c.checked = m.checked); }
+        function toggleTodasBia(m) { document.querySelectorAll('.chk-bia-item').forEach(c => c.checked = m.checked); }
+        function toggleTodasSec(m) { document.querySelectorAll('.chk-sec-item').forEach(c => c.checked = m.checked); }
+        function toggleTodasUtir(m) { document.querySelectorAll('.chk-utir-item').forEach(c => c.checked = m.checked); }
+
+        function salvarAlertaCmdo(e) {
+            e.preventDefault();
+            const az = parseInt(document.getElementById('mC_azimute').value);
+            if(az < 0 || az > 360) return alert("O Azimute deve estar estritamente entre 0º e 360º.");
+
+            const destinos = [];
+            if (document.getElementById('chk_todos_g').checked) destinos.push("TODOS");
+            else document.querySelectorAll('.chk-gaa-item:checked').forEach(c => destinos.push(c.value));
+            if (destinos.length === 0) return alert("Selecione um GAAAe.");
+            const editId = document.getElementById('editIdCmdo').value, id = editId ? editId : 'alerta_' + Date.now();
+            const obj = { id, indicativo: document.getElementById('mC_indicativo').value, destinos, azimute: az, distancia: document.getElementById('mC_distancia').value, idt: document.getElementById('mC_idt').value, nrtipo: document.getElementById('mC_nrtipo').value, vel: document.getElementById('mC_vel').value, rumo: document.getElementById('mC_rumo').value, tempo: document.getElementById('mC_tempo').value, iff: document.getElementById('mC_iff').value, datahora: document.getElementById('mC_datahora').value, emissor: document.getElementById('mC_emissor').value };
+            db.ref(`sisalerta/mensagensCmdo/${id}`).set(obj); cancelarEdicaoCmdo(); alert("Mensagem enviada!");
+        }
+
+        function salvarAlertaGaaae(e) {
+            e.preventDefault();
+            const az = parseInt(document.getElementById('mG_azimute').value);
+            if(az < 0 || az > 360) return alert("O Azimute deve estar estritamente entre 0º e 360º.");
+
+            if (!unidadeAtivaGaaae) return alert("Selecione um GAAAe.");
+            const destinosG = [];
+            if (document.getElementById('chk_todas_bia_ou_sec').checked) destinosG.push("TODOS");
+            else document.querySelectorAll('.chk-g-dest:checked').forEach(c => destinosG.push(c.value));
+            if (destinosG.length === 0) return alert("Selecione pelo menos uma Bateria ou Seção de destino.");
+            const editId = document.getElementById('editIdGaaae').value, id = editId ? editId : 'alerta_g_' + Date.now();
+            const obj = { id, indicativo: document.getElementById('mG_indicativo').value, destinosG, azimute: az, distancia: document.getElementById('mG_distancia').value, idt: document.getElementById('mG_idt').value, nrtipo: document.getElementById('mG_nrtipo').value, vel: document.getElementById('mG_vel').value, rumo: document.getElementById('mG_rumo').value, tempo: document.getElementById('mG_tempo').value, iff: document.getElementById('mG_iff').value, datahora: document.getElementById('mG_datahora').value, emissor: unidadeAtivaGaaae };
+            db.ref(`sisalerta/mensagensGaaae/${unidadeAtivaGaaae}/${id}`).set(obj); cancelarEdicaoGaaae(); alert("Mensagem transmitida às Baterias/Seções!");
+        }
+
+        function salvarAlertaBia(e) {
+            e.preventDefault();
+            const az = parseInt(document.getElementById('mB_azimute').value);
+            if(az < 0 || az > 360) return alert("O Azimute deve estar estritamente entre 0º e 360º.");
+
+            if (!biaAtivaGaaae || !biaAtivaNome) return alert("Selecione a Bateria.");
+            const destinosSec = [];
+            if (document.getElementById('chk_todas_sec').checked) destinosSec.push("TODAS");
+            else document.querySelectorAll('.chk-sec-item:checked').forEach(c => destinosSec.push(c.value));
+            if (destinosSec.length === 0) return alert("Selecione uma Seção.");
+            const editId = document.getElementById('editIdBia').value, id = editId ? editId : 'alerta_sec_' + Date.now();
+            const obj = { id, indicativo: document.getElementById('mB_indicativo').value, destinosSec, azimute: az, distancia: document.getElementById('mB_distancia').value, idt: document.getElementById('mB_idt').value, nrtipo: document.getElementById('mB_nrtipo').value, vel: document.getElementById('mB_vel').value, rumo: document.getElementById('mB_rumo').value, tempo: document.getElementById('mB_tempo').value, iff: document.getElementById('mB_iff').value, datahora: document.getElementById('mB_datahora').value, emissor: `${biaAtivaNome} / ${biaAtivaGaaae}` };
+            db.ref(`sisalerta/mensagensBia/${biaAtivaGaaae}/${biaAtivaNome}/${id}`).set(obj); cancelarEdicaoBia(); alert("Mensagem transmitida às Seções!");
+        }
+
+        function salvarAlertaSecao(e) {
+            e.preventDefault();
+            const az = parseInt(document.getElementById('mS_azimute').value);
+            if(az < 0 || az > 360) return alert("O Azimute deve estar estritamente entre 0º e 360º.");
+
+            if (!secAtivaGaaae || !secAtivaBia || !secAtivaNome) return alert("Selecione a Seção.");
+            const destinosUtir = [];
+            if (document.getElementById('chk_todas_utir').checked) destinosUtir.push("TODAS");
+            else document.querySelectorAll('.chk-utir-item:checked').forEach(c => destinosUtir.push(c.value));
+            if (destinosUtir.length === 0) return alert("Selecione uma UTir.");
+            const editId = document.getElementById('editIdSecao').value, id = editId ? editId : 'alerta_utir_' + Date.now();
+            const obj = { id, indicativo: document.getElementById('mS_indicativo').value, destinosUtir, azimute: az, distancia: document.getElementById('mS_distancia').value, idt: document.getElementById('mS_idt').value, nrtipo: document.getElementById('mS_nrtipo').value, vel: document.getElementById('mS_vel').value, rumo: document.getElementById('mS_rumo').value, tempo: document.getElementById('mS_tempo').value, iff: document.getElementById('mS_iff').value, datahora: document.getElementById('mS_datahora').value, emissor: `${secAtivaNome} / ${secAtivaBia} / ${secAtivaGaaae}` };
+            db.ref(`sisalerta/mensagensSecao/${secAtivaGaaae}/${secAtivaBia}/${secAtivaNome}/${id}`).set(obj); cancelarEdicaoSecao(); alert("Mensagem disparada às UTir!");
+        }
+
+        function preencherFormGaaae(i) { ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mG_${f}`).value = i[f] || ''); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function preencherFormBia(i) { ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mB_${f}`).value = i[f] || ''); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function preencherFormSecao(i) { ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mS_${f}`).value = i[f] || ''); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function cancelarEdicaoCmdo() { document.getElementById('formAlertaCmdo').reset(); document.getElementById('editIdCmdo').value = ''; document.getElementById('btnCancelaCmdo').style.display = 'none'; document.getElementById('mC_emissor').value = "Cmdo DAAe Ex"; }
+        function cancelarEdicaoGaaae() { document.getElementById('formAlertaGaaae').reset(); document.getElementById('editIdGaaae').value = ''; document.getElementById('btnCancelaGaaae').style.display = 'none'; document.getElementById('mG_emissor').value = unidadeAtivaGaaae; }
+        function cancelarEdicaoBia() { document.getElementById('formAlertaBia').reset(); document.getElementById('editIdBia').value = ''; document.getElementById('btnCancelaBia').style.display = 'none'; document.getElementById('mB_emissor').value = `${biaAtivaNome} / ${biaAtivaGaaae}`; }
+        function cancelarEdicaoSecao() { document.getElementById('formAlertaSecao').reset(); document.getElementById('editIdSecao').value = ''; document.getElementById('btnCancelaSecao').style.display = 'none'; document.getElementById('mS_emissor').value = `${secAtivaNome} / ${secAtivaBia} / ${secAtivaGaaae}`; }
+
+        function editarAlertaCmdo(id) { const i = mensagensCmdo[id]; if(!i) return; document.getElementById('editIdCmdo').value = i.id; ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mC_${f}`).value = i[f] || ''); document.getElementById('btnCancelaCmdo').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function excluirAlertaCmdo(id) { if (confirm("Excluir alerta?")) db.ref(`sisalerta/mensagensCmdo/${id}`).remove(); }
+
+        function editarAlertaGaaae(id) { const i = mensagensGaaae[unidadeAtivaGaaae]?.[id]; if(!i) return; document.getElementById('editIdGaaae').value = i.id; ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mG_${f}`).value = i[f] || ''); document.getElementById('btnCancelaGaaae').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function excluirAlertaGaaae(id) { if (confirm("Excluir alerta?")) db.ref(`sisalerta/mensagensGaaae/${unidadeAtivaGaaae}/${id}`).remove(); }
+
+        function editarAlertaBia(id) { const i = mensagensBia[biaAtivaGaaae]?.[biaAtivaNome]?.[id]; if(!i) return; document.getElementById('editIdBia').value = i.id; ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mB_${f}`).value = i[f] || ''); document.getElementById('btnCancelaBia').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function excluirAlertaBia(id) { if (confirm("Excluir alerta?")) db.ref(`sisalerta/mensagensBia/${biaAtivaGaaae}/${biaAtivaNome}/${id}`).remove(); }
+
+        function editarAlertaSecao(id) { const i = mensagensSecao[secAtivaGaaae]?.[secAtivaBia]?.[secAtivaNome]?.[id]; if(!i) return; document.getElementById('editIdSecao').value = i.id; ['indicativo','azimute','distancia','idt','nrtipo','vel','rumo','tempo','iff','datahora'].forEach(f => document.getElementById(`mS_${f}`).value = i[f] || ''); document.getElementById('btnCancelaSecao').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function excluirAlertaSecao(id) { if (confirm("Excluir alerta?")) db.ref(`sisalerta/mensagensSecao/${secAtivaGaaae}/${secAtivaBia}/${secAtivaNome}/${id}`).remove(); }
+
+        function imprimirCard() { window.print(); }
+
+        function gerarCardHTML(i, nivel, editavel = false, caminhoDb = "", nomeUnidadeAtiva = "") {
+            const dest = Array.isArray(i.destinos) ? i.destinos.join(', ') : (i.destinosG ? i.destinosG.join(', ') : (i.destinosBia ? i.destinosBia.join(', ') : (i.destinosSec ? i.destinosSec.join(', ') : (i.destinosUtir ? i.destinosUtir.join(', ') : 'Geral'))));
+            
+            let cientesHTML = "";
+            if (i.cientes) {
+                const lista = Object.keys(i.cientes).map(u => `<span class="badge-ciente">${u} (${i.cientes[u]})</span>`).join(' ');
+                cientesHTML = `<div style="margin-top:0.5rem; font-size:11px; border-top:1px dashed #cbd5e1; padding-top:0.3rem;"><b>Cientes:</b> ${lista}</div>`;
+            }
+
+            const cienteJaDado = i.cientes && i.cientes[nomeUnidadeAtiva];
+
+            return `
+            <div class="msg-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:0.5rem;">
+                    <div>
+                        <span style="background:#dc2626; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px;">ALERTA</span>
+                        <strong style="margin-left:0.5rem; font-size:0.9rem; color:#1e293b;">${i.indicativo || '-'}</strong>
+                    </div>
+                    <div>
+                        <span style="font-size:11px; color:#475569; font-weight:600;">Emissor: <b>${i.emissor || '-'}</b> | Destino: <b style="color:#047857;">${dest}</b></span>
+                    </div>
+                </div>
+
+                <div class="msg-grid">
+                    <div class="msg-item"><span class="msg-label">INDICATIVO</span><span class="msg-val">${i.indicativo || '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">DESTINATÁRIOS</span><span class="msg-val">${dest}</span></div>
+                    <div class="msg-item"><span class="msg-label">AZIMUTE</span><span class="msg-val">${i.azimute ? i.azimute + '°' : '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">DISTÂNCIA</span><span class="msg-val">${i.distancia ? i.distancia + ' NM' : '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">IDT</span><span class="msg-val">${i.idt || '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">NR E TIPO</span><span class="msg-val">${i.nrtipo || '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">VELOCIDADE</span><span class="msg-val">${i.vel ? i.vel + ' Kt' : '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">RUMO</span><span class="msg-val">${i.rumo ? i.rumo + '°' : '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">TEMPO</span><span class="msg-val">${i.tempo ? i.tempo + ' min' : '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">IFF</span><span class="msg-val">${i.iff || '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">DATA / HORA (Z)</span><span class="msg-val">${i.datahora || '-'}</span></div>
+                    <div class="msg-item"><span class="msg-label">EMISSOR</span><span class="msg-val">${i.emissor || '-'}</span></div>
+                </div>
+
+                ${cientesHTML}
+
+                <div class="no-print" style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.75rem;">
+                    ${caminhoDb && nomeUnidadeAtiva && !cienteJaDado ? `<button onclick="registrarCiente('${caminhoDb}', '${i.id}', '${nomeUnidadeAtiva}')" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🟢 DAR CIENTE</button>` : ''}
+                    ${nivel === 'recGaaae' ? `<button onclick='preencherFormGaaae(${JSON.stringify(i)})' style="background:#d97706; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 Usar p/ Desdobrar</button>` : ''}
+                    ${nivel === 'recBia' ? `<button onclick='preencherFormBia(${JSON.stringify(i)})' style="background:#2563eb; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 Usar p/ Desdobrar</button>` : ''}
+                    ${nivel === 'recSecao' ? `<button onclick='preencherFormSecao(${JSON.stringify(i)})' style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 Usar p/ Desdobrar</button>` : ''}
+                    <button onclick="imprimirCard()" style="background:#475569; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🖨️ PDF / Imprimir</button>
+                    ${editavel && nivel === 'histCmdo' ? `<button onclick="editarAlertaCmdo('${i.id}')" style="background:#2563eb; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">✏️ Editar</button><button onclick="excluirAlertaCmdo('${i.id}')" style="background:#dc2626; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🗑️ Excluir</button>` : ''}
+                    ${editavel && nivel === 'histGaaae' ? `<button onclick="editarAlertaGaaae('${i.id}')" style="background:#2563eb; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">✏️ Editar</button><button onclick="excluirAlertaGaaae('${i.id}')" style="background:#dc2626; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🗑️ Excluir</button>` : ''}
+                    ${editavel && nivel === 'histBia' ? `<button onclick="editarAlertaBia('${i.id}')" style="background:#2563eb; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">✏️ Editar</button><button onclick="excluirAlertaBia('${i.id}')" style="background:#dc2626; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🗑️ Excluir</button>` : ''}
+                    ${editavel && nivel === 'histSecao' ? `<button onclick="editarAlertaSecao('${i.id}')" style="background:#2563eb; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">✏️ Editar</button><button onclick="excluirAlertaSecao('${i.id}')" style="background:#dc2626; color:white; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">🗑️ Excluir</button>` : ''}
+                </div>
+            </div>`;
+        }
+
+        function renderizarCardsCmdo() {
+            const container = document.getElementById('cardsCmdo'), chaves = Object.keys(mensagensCmdo);
+            if (chaves.length === 0) container.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:1rem;">Nenhum alerta emitido.</p>`;
+            else { let html = ""; chaves.reverse().forEach(k => html += gerarCardHTML(mensagensCmdo[k], 'histCmdo', true)); container.innerHTML = html; }
+        }
+
+        function atualizarDashboardCmdo() {
+            const lista = ["1º GAAAe", "2º GAAAe", "3º GAAAe", "4º GAAAe", "5º GAAAe Sl", "11º GAAAe", "12º GAAAe"];
+            lista.forEach(u => {
+                const el = document.getElementById(`st_${u}`);
+                let ok = false;
+                Object.keys(mensagensCmdo).forEach(id => {
+                    if (mensagensCmdo[id].cientes && mensagensCmdo[id].cientes[u]) ok = true;
+                });
+                if (el) {
+                    el.innerText = ok ? "🟢 CIENTE" : "🔴 Aguardando";
+                    el.style.color = ok ? "#16a34a" : "#dc2626";
+                }
+            });
+        }
+
+        function atualizarRecebidasGaaae() {
+            const container = document.getElementById('listaRecebidaGaaae'), chaves = Object.keys(mensagensCmdo);
+            const filtradas = chaves.filter(k => mensagensCmdo[k].destinos?.includes("TODOS") || mensagensCmdo[k].destinos?.includes(unidadeAtivaGaaae));
+            if (filtradas.length === 0) container.innerHTML = `<p style="font-size:0.75rem; color:#78350f;">Nenhum alerta do Comando.</p>`;
+            else { let html = ""; filtradas.reverse().forEach(k => html += gerarCardHTML(mensagensCmdo[k], 'recGaaae', false, 'sisalerta/mensagensCmdo', unidadeAtivaGaaae)); container.innerHTML = html; }
+        }
+
+        function renderizarHistoricoGaaae() {
+            const container = document.getElementById('cardsHistoricoGaaae'), obj = mensagensGaaae[unidadeAtivaGaaae] || {}, chaves = Object.keys(obj);
+            if (chaves.length === 0) container.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:1rem;">Nenhum alerta emitido pelo Grupo.</p>`;
+            else { let html = ""; chaves.reverse().forEach(k => html += gerarCardHTML(obj[k], 'histGaaae', true)); container.innerHTML = html; }
+        }
+
+        function atualizarRecebidasBia() {
+            const container = document.getElementById('listaRecebidaBia'), obj = mensagensGaaae[biaAtivaGaaae] || {}, chaves = Object.keys(obj);
+            const filtradas = chaves.filter(k => {
+                const dest = obj[k].destinosG;
+                if (!dest) return false;
+                return dest.includes("TODOS") || dest.includes(biaAtivaNome);
+            });
+            if (filtradas.length === 0) container.innerHTML = `<p style="font-size:0.75rem; color:#1e40af;">Nenhum alerta recebido do GAAAe.</p>`;
+            else { let html = ""; filtradas.reverse().forEach(k => html += gerarCardHTML(obj[k], 'recBia', false, `sisalerta/mensagensGaaae/${biaAtivaGaaae}`, biaAtivaNome)); container.innerHTML = html; }
+        }
+
+        function renderizarHistoricoBia() {
+            const container = document.getElementById('cardsHistoricoBia'), obj = mensagensBia[biaAtivaGaaae]?.[biaAtivaNome] || {}, chaves = Object.keys(obj);
+            if (chaves.length === 0) container.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:1rem;">Nenhum alerta emitido às Seções.</p>`;
+            else { let html = ""; chaves.reverse().forEach(k => html += gerarCardHTML(obj[k], 'histBia', true)); container.innerHTML = html; }
+        }
+
+        function atualizarRecebidasSecao() {
+            const container = document.getElementById('listaRecebidaSecao');
+            let html = "";
+
+            const objG = mensagensGaaae[secAtivaGaaae] || {};
+            const filtradosG = Object.keys(objG).filter(k => {
+                const dest = objG[k].destinosG;
+                if (!dest) return false;
+                return dest.includes("TODOS") || dest.includes(`${secAtivaNome} / ${secAtivaBia}`);
+            });
+            filtradosG.reverse().forEach(k => {
+                html += `<div style="margin-bottom:0.5rem;"><span style="background:#b45309; color:white; font-size:10px; padding:2px 4px; border-radius:3px;">Direto do Grupo</span></div>` + gerarCardHTML(objG[k], 'recSecao', false, `sisalerta/mensagensGaaae/${secAtivaGaaae}`, secAtivaNome);
+            });
+
+            const objB = mensagensBia[secAtivaGaaae]?.[secAtivaBia] || {};
+            const filtradosB = Object.keys(objB).filter(k => {
+                const dest = objB[k].destinosSec;
+                if (!dest) return false;
+                return dest.includes("TODOS") || dest.includes(secAtivaNome);
+            });
+            filtradosB.reverse().forEach(k => {
+                html += `<div style="margin-bottom:0.5rem;"><span style="background:#1d4ed8; color:white; font-size:10px; padding:2px 4px; border-radius:3px;">Via Bateria</span></div>` + gerarCardHTML(objB[k], 'recSecao', false, `sisalerta/mensagensBia/${secAtivaGaaae}/${secAtivaBia}`, secAtivaNome);
+            });
+
+            if (html === "") container.innerHTML = `<p style="font-size:0.75rem; color:#166534;">Nenhum alerta recebido da Bateria ou Grupo.</p>`;
+            else container.innerHTML = html;
+        }
+
+        function renderizarHistoricoSecao() {
+            const container = document.getElementById('cardsHistoricoSecao'), obj = mensagensSecao[secAtivaGaaae]?.[secAtivaBia]?.[secAtivaNome] || {}, chaves = Object.keys(obj);
+            if (chaves.length === 0) container.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:1rem;">Nenhum alerta emitido às UTir.</p>`;
+            else { let html = ""; chaves.reverse().forEach(k => html += gerarCardHTML(obj[k], 'histSecao', true)); container.innerHTML = html; }
+        }
+
+        function renderizarPainelUtir() {
+            document.getElementById('tituloPainelUtir').innerText = `Painel de Alertas - ${utirAtivaNome} / ${utirAtivaSec} / ${utirAtivaBia} / ${utirAtivaGaaae}`;
+            const containerStatus = document.getElementById('statusTaticoUtir');
+            const containerCards = document.getElementById('cardsUtirVisualizacao');
+
+            const objSec = mensagensSecao[utirAtivaGaaae]?.[utirAtivaBia]?.[utirAtivaSec] || {};
+            const chavesSec = Object.keys(objSec);
+            const msgsDiretasUtir = chavesSec.filter(k => objSec[k].destinosUtir?.includes("TODOS") || objSec[k].destinosUtir?.includes(utirAtivaNome));
+
+            const objBia = mensagensBia[utirAtivaGaaae]?.[utirAtivaBia] || {};
+            const chavesBia = Object.keys(objBia);
+            const msgsAlertaVermelhoBia = chavesBia.filter(k => objBia[k].destinosSec?.includes("TODOS") || objBia[k].destinosSec?.includes(utirAtivaSec));
+
+            const objGaaae = mensagensGaaae[utirAtivaGaaae] || {};
+            const chavesGaaae = Object.keys(objGaaae);
+            const msgsAlertaVermelhoG = chavesGaaae.filter(k => {
+                const dest = objGaaae[k].destinosG;
+                if (!dest) return false;
+                return dest.includes("TODOS") || dest.includes(utirAtivaBia) || dest.includes(`${utirAtivaSec} / ${utirAtivaBia}`);
+            });
+
+            const msgsAlertaAmarelo = chavesGaaae.filter(k => {
+                const dest = objGaaae[k].destinosG;
+                if (!dest) return false;
+                return dest.includes("TODOS") || dest.includes(utirAtivaBia);
+            });
+
+            let statusHTML = "";
+
+            if (msgsDiretasUtir.length > 0) {
+                statusHTML = `
+                <div class="banner-alerta-vermelho" style="background:#dc2626; color:white; border-color:#991b1b;">
+                    <h3 style="font-weight:bold; font-size:1.1rem; margin:0 0 0.25rem 0;">💥 ORDEM DE ENGAJAMENTO / ALERTA DIRETO</h3>
+                    <p style="font-size:0.8rem; margin:0;">Aeronave / Vetor direcionado à sua Unidade de Tiro. Confira os dados táticos abaixo:</p>
+                </div>`;
+            } else if (msgsAlertaVermelhoBia.length > 0 || msgsAlertaVermelhoG.length > 0) {
+                const ult = msgsAlertaVermelhoBia.length > 0 ? objBia[msgsAlertaVermelhoBia[msgsAlertaVermelhoBia.length - 1]] : objGaaae[msgsAlertaVermelhoG[msgsAlertaVermelhoG.length - 1]];
+                statusHTML = `
+                <div class="banner-alerta-vermelho">
+                    <h3 style="font-weight:bold; font-size:1.1rem; margin:0 0 0.25rem 0;">🔴 ALERTA VERMELHO - VETOR NA SUBZONA DA SEÇÃO</h3>
+                    <p style="font-size:0.8rem; margin:0;"><b>Status:</b> Alerta emitido para a <b>${utirAtivaSec}</b>. Mantenha posição de prontidão elevada!</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem; font-weight:bold;">Indicativo: ${ult.indicativo || '-'} | IDT: ${ult.idt || '-'} | Azimute: ${ult.azimute}° | Distância: ${ult.distancia} NM</p>
+                </div>`;
+            } else if (msgsAlertaAmarelo.length > 0) {
+                const ult = objGaaae[msgsAlertaAmarelo[msgsAlertaAmarelo.length - 1]];
+                statusHTML = `
+                <div class="banner-alerta-amarelo">
+                    <h3 style="font-weight:bold; font-size:1.1rem; margin:0 0 0.25rem 0;">🟡 ALERTA AMARELO - VETOR NA ÁREA DA BATERIA</h3>
+                    <p style="font-size:0.8rem; margin:0;"><b>Status:</b> O Grupo transmitiu alerta para a <b>${utirAtivaBia}</b>. Fique em condições de operação.</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem; font-weight:bold;">Indicativo: ${ult.indicativo || '-'} | IDT: ${ult.idt || '-'} | Azimute: ${ult.azimute}° | Distância: ${ult.distancia} NM</p>
+                </div>`;
+            } else {
+                statusHTML = `<div style="background:#f3f4f6; padding:1rem; border-radius:0.5rem; text-align:center; color:#6b7280; font-size:0.85rem; font-weight:bold; border:1px solid #d1d5db; margin-bottom:1rem;">🟢 STATUS NORMAL - NENHUM ALERTA ATIVO PARA ESTE SETOR</div>`;
+            }
+
+            containerStatus.innerHTML = statusHTML;
+
+            if (msgsDiretasUtir.length === 0) {
+                containerCards.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:1rem;">Nenhuma ficha de mensagem direta para esta UTir no momento.</p>`;
+            } else {
+                let html = "";
+                msgsDiretasUtir.reverse().forEach(k => {
+                    html += gerarCardHTML(objSec[k], 'utir', false, `sisalerta/mensagensSecao/${utirAtivaGaaae}/${utirAtivaBia}/${utirAtivaSec}`, utirAtivaNome);
+                });
+                containerCards.innerHTML = html;
+            }
+        }
+    </script>
+</body>
+</html>
