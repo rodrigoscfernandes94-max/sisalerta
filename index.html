@@ -116,7 +116,7 @@
     <main class="max-w-7xl mx-auto my-6 p-4 w-full flex-grow">
 
         <!-- ================= PAINEL 1: CMDO DAAe Ex ================= -->
-        <div id="painelCmdo" style="display: none;">
+        <div id="painelCmdo" style="display: block;">
             
             <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
                 <h3 class="font-bold text-sm text-green-950 mb-2 border-b pb-1">📊 Monitor de Cientes em Tempo Real (Cmdo DAAe Ex)</h3>
@@ -414,11 +414,6 @@
 
     </main>
 
-    <!-- RODAPÉ -->
-    <footer style="text-align: center; padding: 1.5rem; background-color: #1b3022; color: #86efac; font-size: 0.75rem; font-weight: bold; border-top: 1px solid #065f46; margin-top: auto;">
-        Desenvolvido pelo 2º Sgt Art Rodrigo Sá
-    </footer>
-
     <!-- MODAIS DE ACESSO -->
     <div id="modalSenha" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 9999;">
         <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; width: 100%; max-width: 400px; border-top: 4px solid #f59e0b; margin: auto;">
@@ -478,13 +473,13 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyAYzlVN6Y9AvtJF5vT65JCKXy7ga48mVJg",
-            authDomain: "siscord-eb.firebaseapp.com",
-            databaseURL: "https://siscord-eb-default-rtdb.firebaseio.com",
-            projectId: "siscord-eb",
-            storageBucket: "siscord-eb.firebasestorage.app",
-            messagingSenderId: "523448874412",
-            appId: "1:523448874412:web:4277213ea4a2067ac97609"
+            apiKey: "AIzaSyByZfetP3avsukqEzRHIS4s4TmlFbysEBY",
+            authDomain: "sisalerta-eb.firebaseapp.com",
+            databaseURL: "https://sisalerta-eb-default-rtdb.firebaseio.com",
+            projectId: "sisalerta-eb",
+            storageBucket: "sisalerta-eb.firebasestorage.app",
+            messagingSenderId: "986144157024",
+            appId: "1:986144157024:web:95c4a27a0136e9bc964205"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -605,10 +600,7 @@
         function validarSenhaModal(e) {
             e.preventDefault();
             const senha = document.getElementById('inputSenhaModal').value;
-            if (tipoPendencia === "cmdo" && senha === "artilharia") { 
-                fecharModalSenha(); 
-                mudarPainelPrincipal('cmdo'); 
-            }
+            if (tipoPendencia === "cmdo" && senha === "artilharia") { fecharModalSenha(); mudarPainelPrincipal('cmdo'); }
             else if (senhasGAAAe[tipoPendencia] && senha === senhasGAAAe[tipoPendencia]) {
                 fecharModalSenha(); unidadeAtivaGaaae = tipoPendencia;
                 mudarPainelPrincipal('gaaae'); destacarSubAbaAtiva(unidadeAtivaGaaae);
@@ -711,7 +703,7 @@
 
             if (!biaAtivaGaaae || !biaAtivaNome) return alert("Selecione a Bateria.");
             const destinosSec = [];
-            if (document.getElementById('chk_todas_sec').checked) destinosSec.push("TODAS");
+            if (document.getElementById('chk_todas_sec').checked) destinosSec.push("TODOS");
             else document.querySelectorAll('.chk-sec-item:checked').forEach(c => destinosSec.push(c.value));
             if (destinosSec.length === 0) return alert("Selecione uma Seção.");
             const editId = document.getElementById('editIdBia').value, id = editId ? editId : 'alerta_sec_' + Date.now();
@@ -726,7 +718,7 @@
 
             if (!secAtivaGaaae || !secAtivaBia || !secAtivaNome) return alert("Selecione a Seção.");
             const destinosUtir = [];
-            if (document.getElementById('chk_todas_utir').checked) destinosUtir.push("TODAS");
+            if (document.getElementById('chk_todas_utir').checked) destinosUtir.push("TODOS");
             else document.querySelectorAll('.chk-utir-item:checked').forEach(c => destinosUtir.push(c.value));
             if (destinosUtir.length === 0) return alert("Selecione uma UTir.");
             const editId = document.getElementById('editIdSecao').value, id = editId ? editId : 'alerta_utir_' + Date.now();
@@ -963,6 +955,10 @@
                 containerCards.innerHTML = html;
             }
         }
-    </script>
+   </script>
+
+    <footer style="text-align: center; padding: 1.5rem; background-color: #1b3022; color: #86efac; font-size: 0.75rem; font-weight: bold; border-top: 1px solid #065f46; margin-top: auto;">
+        Desenvolvido pelo 2º Sgt Art Rodrigo Sá
+    </footer>
 </body>
 </html>
