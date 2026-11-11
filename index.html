@@ -391,7 +391,7 @@
             </div>
 
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
-                <h3 class="font-bold text-base mb-3 text-gray-800">Alertas Emitidos pela Seção para as UTir</h3>
+                <h3 class="font-bold text-base mb-3 text-gray-800">Alertas Emitidos pela Seção para las UTir</h3>
                 <div id="cardsHistoricoSecao"></div>
             </div>
         </div>
@@ -556,6 +556,14 @@
         let mensagensGaaae = {};
         let mensagensBia = {};
         let mensagensSecao = {};
+
+        // Inicializa com todos os painéis ocultos até que o operador faça o login/senha
+        document.addEventListener("DOMContentLoaded", () => {
+            ['Cmdo', 'Gaaae', 'Bia', 'Secao', 'Utir'].forEach(p => {
+                const el = document.getElementById(`painel${p}`);
+                if(el) el.style.display = 'none';
+            });
+        });
 
         db.ref('sisalerta/mensagensCmdo').on('value', (s) => { 
             mensagensCmdo = s.val() || {}; 
